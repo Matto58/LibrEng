@@ -22,11 +22,26 @@
 	}
 	public class Board
 	{
-		public Piece[,] pieces;
+		public Piece?[,] pieces;
 
 		public Board()
 		{
-			pieces = new Piece[8, 8];
+			pieces = new Piece?[8, 8];
+		}
+
+		public string draw()
+		{
+			string o = "+-+-+-+-+-+-+-+-+";
+			for (int y = 0; y < 8; y++)
+			{
+				o += "\n|";
+				for (int x = 0; x < 8; x++)
+				{
+					o += "|" + (pieces[x,y] != null ? pieces[x, y]!.type.ToString()[0] : ' ');
+				}
+				o += "|";
+			}
+			return o;
 		}
 	}
 }
