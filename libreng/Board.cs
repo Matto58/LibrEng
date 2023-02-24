@@ -1,4 +1,5 @@
 ﻿namespace Mattodev.LibrEng;
+using static System.MathF;
 
 public enum PColor
 {
@@ -36,6 +37,20 @@ public class Piece
 			PType.King => "K",
 			_ => " "
 		};
+
+	public static float dist(int x1, int y1, int x2, int y2)
+		=> Abs(Sqrt(x1 * x2 + y1 * y2));
+
+	public Board posFromFen(string fen)
+	{
+		Board board = new();
+		string[] f = fen.Split(' ');
+		string[] p = f[0].Split('/');
+
+		return board;
+	}
+
+	public const float CORNER_DIST = 9.8994949366117f;
 }
 public class Board
 {
@@ -57,6 +72,72 @@ public class Board
 	{
 		pieces[x, y] = new(color, type);
 	}
+	
+	public Board selectColor(PColor color)
+	{
+		Board b = new();
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 8; x++)
+				if (pieces[x, y].color == color)
+					b.pieces[x, y] = pieces[x, y];
+		return b;
+	}
+	public Board selectType(PType type)
+	{
+		Board b = new();
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 8; x++)
+				if (pieces[x, y].type == type)
+					b.pieces[x,y] = pieces[x, y];
+
+		return b;
+	}
+	public List<(int x, int y)> lookForPiecePositions(PColor color)
+	{
+		List<(int, int)> piecePos = new();
+
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 8; x++)
+				if (pieces[x, y].color == color)
+					piecePos.Add((x, y));
+
+		return piecePos;
+	}
+	public List<(int x, int y)> lookForPiecePositions(PType type)
+	{
+		List<(int, int)> piecePos = new();
+
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 8; x++)
+				if (pieces[x, y].type == type)
+					piecePos.Add((x, y));
+
+		return piecePos;
+	}
+	public List<(int x, int y)> lookForPiecePositions(PColor color, PType type)
+	{
+		List<(int, int)> piecePos = new();
+
+		for (int y = 0; y < 8; y++)
+			for (int x = 0; x < 8; x++)
+				if (pieces[x, y].type == type && pieces[x, y].color == color)
+					piecePos.Add((x, y));
+
+		return piecePos;
+	}
+
+	public List<Piece> lookForPieces(PColor color) =>
+		lookForPiecePositions(color)
+		.Select(t => pieces[t.Item1, t.Item2])
+		.ToList();
+	public List<Piece> lookForPieces(PType type) =>
+		lookForPiecePositions(type)
+		.Select(t => pieces[t.Item1, t.Item2])
+		.ToList();
+	public List<Piece> lookForPieces(PColor color, PType type) =>
+		lookForPiecePositions(color, type)
+		.Select(t => pieces[t.Item1, t.Item2])
+		.ToList();
 
 	public string draw()
 	{
