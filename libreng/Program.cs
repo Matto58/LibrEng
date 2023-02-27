@@ -2,6 +2,12 @@
 
 internal class Program
 {
+	static int Err(string msg, int code)
+	{
+		Console.WriteLine($"\nERROR {code}! {msg}");
+		return code;
+	}
+
 	static int Main(string[] args)
 	{
 		Game game;
@@ -13,7 +19,7 @@ internal class Program
 			Console.Write("Are you playing with the (W)hite pieces or the (B)lack pieces?");
 			ConsoleKeyInfo k = Console.ReadKey();
 			if (k.KeyChar.ToString().ToUpper() != "W" || k.KeyChar.ToString().ToUpper() == "B")
-				return 1001;
+				return Err("Invalid piece color!", 1001);
 			PColor color;
 
 			Console.WriteLine("\nWhat's your name?");
@@ -23,7 +29,8 @@ internal class Program
 			PlTitle title = Player.titleFromText(Console.ReadLine()!);
 
 			Console.WriteLine("What's your ELO/rating?");
-			if (!int.TryParse(Console.ReadLine(), out int elo)) return 1002;
+			if (!int.TryParse(Console.ReadLine(), out int elo))
+				return Err("Invalid rating!", 1002);
 
 			if (k.KeyChar.ToString().ToLower() == "W")
 				color = PColor.White;
@@ -52,10 +59,13 @@ internal class Program
 				{
 					// todo: finish fen import
 					case "-pf" or "--play-fen":
+						// the following line is only here to get the IndexOutOfRangeException before starting game
+						string fen = args[1];
+
 						Console.Write("Are you playing with the (W)hite pieces or the (B)lack pieces?");
 						ConsoleKeyInfo k = Console.ReadKey();
 						if (k.KeyChar.ToString().ToUpper() != "W" || k.KeyChar.ToString().ToUpper() == "B")
-							return 1001;
+							return Err("Invalid piece color!", 1001);
 						PColor color;
 
 						Console.WriteLine("\nWhat's your name?");
@@ -65,7 +75,8 @@ internal class Program
 						PlTitle title = Player.titleFromText(Console.ReadLine()!);
 
 						Console.WriteLine("What's your ELO/rating?");
-						if (!int.TryParse(Console.ReadLine(), out int elo)) return 1002;
+						if (!int.TryParse(Console.ReadLine(), out int elo))
+							return Err("Invalid rating!", 1002);
 
 						if (k.KeyChar.ToString().ToLower() == "W")
 							color = PColor.White;
@@ -73,12 +84,15 @@ internal class Program
 							color = PColor.Black;
 						else return 1003;
 
+						Board? brd = Board.fromFEN(fen);
+						if (brd == null) return Err("Invalid FEN!", 1005);
+
 						player = new(name, title, color, elo);
 						game = new(
 							color != PColor.White ? player : new($"LibrEng {EngInfo.ver}", PlTitle.Bot, PColor.White, EngInfo.elo),
 							color != PColor.Black ? player : new($"LibrEng {EngInfo.ver}", PlTitle.Bot, PColor.Black, EngInfo.elo))
 						{
-							board = Board.fromFEN(args[1])
+							board = brd
 						};
 
 						while (game.running)
@@ -90,21 +104,21 @@ internal class Program
 						}
 						break;
 					case "-ef" or "--eval-fen":
-						Console.WriteLine(Board.fromFEN(args[1]).eval());
+						Board? brd2 = Board.fromFEN(args[0]);
+						if (brd2 == null) return Err("Invalid FEN!", 1005);
+						Console.WriteLine(brd2.eval());
 						break;
 				}
 			}
 			catch (IndexOutOfRangeException)
 			{
-				Console.WriteLine(
-					"ERROR! Too little args"
-					+ (args[0] == "-pf" || args[0] == "--play-fen" ? " (maybe put in a FEN you dumbass)" : ""));
-				return 1004;
+				return Err("Too little args!"
+					+ (args[0] == "-pf" || args[0] == "--play-fen"
+					|| args[0] == "-ef" || args[0] == "--eval-fen" ? " (maybe put in a FEN you dumbass)" : ""), 1004);
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("INTERNAL ERROR! " + e.Message);
-				return 1100;
+				return Err("Internal: " + e.Message, 1100);
 			}
 		}
 

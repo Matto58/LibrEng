@@ -51,6 +51,25 @@ public class Piece
 			"K" => PType.King,
 			_ => PType.Pawn
 		};
+	public static Piece? fromFenLetter(string l, int x, int y)
+		=> l switch
+		{
+			"R" => new Piece(PColor.White, PType.Rook, new(x, y)),
+			"B" => new Piece(PColor.White, PType.Bishop, new(x, y)),
+			"N" => new Piece(PColor.White, PType.Knight, new(x, y)),
+			"Q" => new Piece(PColor.White, PType.Queen, new(x, y)),
+			"K" => new Piece(PColor.White, PType.King, new(x, y)),
+			"P" => new Piece(PColor.White, PType.Pawn, new(x, y)),
+
+			"r" => new Piece(PColor.Black, PType.Rook, new(x, y)),
+			"b" => new Piece(PColor.Black, PType.Bishop, new(x, y)),
+			"n" => new Piece(PColor.Black, PType.Knight, new(x, y)),
+			"q" => new Piece(PColor.Black, PType.Queen, new(x, y)),
+			"k" => new Piece(PColor.Black, PType.King, new(x, y)),
+			"p" => new Piece(PColor.Black, PType.Pawn, new(x, y)),
+
+			_ => null
+		};
 
 	public static float dist(int x1, int y1, int x2, int y2)
 		=> Abs(Sqrt(x1 * x2 + y1 * y2));
@@ -96,10 +115,10 @@ public class Board
 	public Board selectColor(PColor color)
 	{
 		Board b = new();
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 8; x++)
-				if (pieces[x, y].color == color)
-					b.pieces[x, y] = pieces[x, y];
+		foreach (Piece p in pieces)
+			if (p.color == color)
+				b.place(p);
+
 		return b;
 	}
 
@@ -111,10 +130,9 @@ public class Board
 	public Board selectType(PType type)
 	{
 		Board b = new();
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 8; x++)
-				if (pieces[x, y].type == type)
-					b.place(pieces[x, y]);
+		foreach (Piece p in pieces)
+			if (p.type == type)
+				b.place(p);
 
 		return b;
 	}
@@ -128,10 +146,9 @@ public class Board
 	{
 		List<(int, int)> piecePos = new();
 
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 8; x++)
-				if (pieces[x, y].color == color)
-					piecePos.Add((x, y));
+		foreach (Piece p in pieces)
+			if (p.color == color)
+				piecePos.Add(((int)p.pos.X, (int)p.pos.Y));
 
 		return piecePos;
 	}
@@ -145,10 +162,9 @@ public class Board
 	{
 		List<(int, int)> piecePos = new();
 
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 8; x++)
-				if (pieces[x, y].type == type)
-					piecePos.Add((x, y));
+		foreach (Piece p in pieces)
+			if (p.type == type)
+				piecePos.Add(((int)p.pos.X, (int)p.pos.Y));
 
 		return piecePos;
 	}
@@ -163,10 +179,9 @@ public class Board
 	{
 		List<(int, int)> piecePos = new();
 
-		for (int y = 0; y < 8; y++)
-			for (int x = 0; x < 8; x++)
-				if (pieces[x, y].type == type && pieces[x, y].color == color)
-					piecePos.Add((x, y));
+		foreach (Piece p in pieces)
+			if (p.type == type && p.color == color)
+				piecePos.Add(((int)p.pos.X, (int)p.pos.Y));
 
 		return piecePos;
 	}
@@ -235,7 +250,7 @@ public class Board
 	/// </summary>
 	/// <param name="fen">The FEN <see cref="string"/>.</param>
 	/// <returns>The board.</returns>
-	public static Board fromFEN(string fen)
+	public static Board? fromFEN(string fen)
 	{
 		Board board = new();
 		string[] f = fen.Split(" ");
@@ -249,9 +264,9 @@ public class Board
 				if (int.TryParse(l, out int n)) x += n - 2;
 				else
 				{
-					board.place(
-						new(l.ToLower() == l ? PColor.Black : PColor.White,
-							Piece.typeFromLetter(l.ToUpper()), new(x, y)));
+					Piece? piece = Piece.fromFenLetter(l, x, y);
+					if (piece != null) board.place(piece);
+					else return null;
 				}
 			}
 		}
