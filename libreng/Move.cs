@@ -7,14 +7,27 @@ namespace Mattodev.LibrEng
 		public static string numToFile(int num)
 			=> num switch
 			{
-				0 => "h",
-				1 => "g",
-				2 => "f",
-				3 => "e",
-				4 => "d",
-				5 => "c",
-				6 => "b",
-				7 => "a",
+				0 => "a",
+				1 => "b",
+				2 => "c",
+				3 => "d",
+				4 => "e",
+				5 => "f",
+				6 => "g",
+				7 => "h",
+				_ => ""
+			};
+		public static string numToRank(int num)
+			=> num switch
+			{
+				0 => "8",
+				1 => "7",
+				2 => "6",
+				3 => "5",
+				4 => "4",
+				5 => "3",
+				6 => "2",
+				7 => "1",
 				_ => ""
 			};
 
@@ -36,11 +49,14 @@ namespace Mattodev.LibrEng
 		}
 
 		public override string ToString() =>
-			(piece.type != PType.Pawn ? Piece.letterFromType(piece.type) : "")
-			+ (takes ? "x" : "")
+			piece.type
+			+ " @ "
+			+ numToFile((int)piece.pos.Y)
+			+ numToRank((int)piece.pos.X)
+			+ (takes ? " takes" : " to")
 			+ numToFile(y)
-			+ (x + 1).ToString()
-			+ (check ? "+" : "")
-			+ (mate ? "#" : "");
+			+ numToRank(x)
+			+ (check ? ", check" : "")
+			+ (mate ? ", checkmate" : "");
 	}
 }
