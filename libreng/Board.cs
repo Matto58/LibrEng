@@ -249,7 +249,7 @@ public class Board
 	/// Loads a board from a FEN <see cref="string"/>.
 	/// </summary>
 	/// <param name="fen">The FEN <see cref="string"/>.</param>
-	/// <returns>The board.</returns>
+	/// <returns>The board, or <see langword="null"/> if the FEN is invalid.</returns>
 	public static Board? fromFEN(string fen)
 	{
 		Board board = new();
@@ -316,9 +316,26 @@ public class Board
 	// enemy pieces and friendly king
 	public float kingSafetyPt2(PColor color)
 	{
-		float e = 0f;
+		var kings = lookForPiecePositions((PColor)(((int)color + 1) % 2), PType.King);
+		if (kings.Count == 0) return float.PositiveInfinity;
+		var king = kings[0];
 
-		return e;
+		float dist = 0f;
+		int count = 0;
+
+		for (int y = 0; y < 8; y++)
+		{
+			for (int x = 0; x < 8; x++)
+			{
+				if (pieces[x, y].type != PType.Empty && pieces[x, y].type != PType.Pawn)
+				{
+					dist += Piece.dist(x, y, king.x, king.y);
+					count++;
+				}
+			}
+		}
+
+		return Piece.CORNER_DIST - (dist / count);
 	}
 	public float material(PColor color)
 	{
