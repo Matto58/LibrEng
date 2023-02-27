@@ -14,24 +14,22 @@ internal class Program
 			ConsoleKeyInfo k = Console.ReadKey();
 			if (k.KeyChar.ToString().ToUpper() != "W" || k.KeyChar.ToString().ToUpper() == "B")
 				return 1001;
-
-			string name = "";
-			PlTitle title = PlTitle.None;
-			PColor color = PColor.Black;
+			PColor color;
 
 			Console.WriteLine("\nWhat's your name?");
-			name = Console.ReadLine()!;
+			string name = Console.ReadLine()!;
 
 			Console.WriteLine("What's your title (if you have one)? (i.e. IM, WGM, ...)");
-			title = Player.titleFromText(Console.ReadLine()!);
+			PlTitle title = Player.titleFromText(Console.ReadLine()!);
 
 			Console.WriteLine("What's your ELO/rating?");
 			if (!int.TryParse(Console.ReadLine(), out int elo)) return 1002;
 
 			if (k.KeyChar.ToString().ToLower() == "W")
 				color = PColor.White;
-			if (k.KeyChar.ToString().ToLower() == "B")
+			else if (k.KeyChar.ToString().ToLower() == "B")
 				color = PColor.Black;
+			else return 1003;
 
 			player = new(name, title, color, elo);
 			game = new(
@@ -58,24 +56,22 @@ internal class Program
 						ConsoleKeyInfo k = Console.ReadKey();
 						if (k.KeyChar.ToString().ToUpper() != "W" || k.KeyChar.ToString().ToUpper() == "B")
 							return 1001;
-
-						string name = "";
-						PlTitle title = PlTitle.None;
-						PColor color = PColor.Black;
+						PColor color;
 
 						Console.WriteLine("\nWhat's your name?");
-						name = Console.ReadLine()!;
+						string name = Console.ReadLine()!;
 
 						Console.WriteLine("What's your title (if you have one)? (i.e. IM, WGM, ...)");
-						title = Player.titleFromText(Console.ReadLine()!);
+						PlTitle title = Player.titleFromText(Console.ReadLine()!);
 
 						Console.WriteLine("What's your ELO/rating?");
 						if (!int.TryParse(Console.ReadLine(), out int elo)) return 1002;
 
 						if (k.KeyChar.ToString().ToLower() == "W")
 							color = PColor.White;
-						if (k.KeyChar.ToString().ToLower() == "B")
+						else if (k.KeyChar.ToString().ToLower() == "B")
 							color = PColor.Black;
+						else return 1003;
 
 						player = new(name, title, color, elo);
 						game = new(
@@ -100,7 +96,15 @@ internal class Program
 			}
 			catch (IndexOutOfRangeException)
 			{
-				return 1003;
+				Console.WriteLine(
+					"ERROR! Too little args"
+					+ (args[0] == "-pf" || args[0] == "--play-fen" ? " (maybe put in a FEN you dumbass)" : ""));
+				return 1004;
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("INTERNAL ERROR! " + e.Message);
+				return 1100;
 			}
 		}
 
