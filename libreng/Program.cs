@@ -46,7 +46,7 @@ internal class Program
 			string ss = game.shortSummary();
 			
 			if (ss[0] == '!')
-				return int.Parse(ss.Split(' ')[1]);
+				return Err(string.Join(' ', ss.Split(' ')[2..]), int.Parse(ss.Split(' ')[1]));
 			Console.Clear();
 			Console.WriteLine(ss);
 			Console.WriteLine(game.board.draw());
@@ -59,7 +59,7 @@ internal class Program
 				{
 					// todo: finish fen import
 					case "-pf" or "--play-fen":
-						// the following line is only here to get the IndexOutOfRangeException before starting game
+						// the following line is only here to catch a IndexOutOfRangeException before starting game
 						string fen = args[1];
 
 						Console.Write("Are you playing with the (W)hite pieces or the (B)lack pieces?");

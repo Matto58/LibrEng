@@ -32,7 +32,7 @@ public class Game
 		string wtitle = white.title != PlTitle.None ? $"[{Player.textFromTitle(white.title)}] " : "";
 		string btitle = black.title != PlTitle.None ? $"[{Player.textFromTitle(black.title)}] " : "";
 
-		if (float.IsNaN(eval)) return "! 1101"; // error 1101
+		if (float.IsNaN(eval)) return "! 1101 Evaluation is NaN! (e.g. invalid board)"; // error 1101
 		
 		return
 			$"{move} to move - Eval: {(float.IsPositive(eval) ? "+" : "-")}{eval}\n" +
