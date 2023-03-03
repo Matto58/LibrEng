@@ -6,7 +6,7 @@
 		{
 			return true; // for now
 		}
-		public static bool canCastle(Board b, ref Piece rook, ref Piece king, bool longCastle)
+		public static bool canCastle(Board b, (int x, int y) king, (int x, int y) rook, bool longCastle)
 		{
 			return false; // we dont have castling fully implemented yet
 		}
