@@ -33,7 +33,7 @@ namespace Mattodev.LibrEng
 
 		public Piece piece;
 		public int x, y;
-		public bool takes, check, mate;
+		public bool takes, check, mate, doesCastle, isCastleLong;
 
 		public Move(Piece piece, int x, int y, bool takes, bool check, bool mate)
 		{
@@ -49,13 +49,15 @@ namespace Mattodev.LibrEng
 		}
 
 		public override string ToString() =>
-			piece.type
+			(!doesCastle ? piece.color.ToString()
+			+ " "
+			+ piece.type.ToString().ToLower()
 			+ " @ "
 			+ numToFile((int)piece.pos.Y)
 			+ numToRank((int)piece.pos.X)
-			+ (takes ? " takes" : " to")
+			+ (takes ? " takes " : " to ")
 			+ numToFile(y)
-			+ numToRank(x)
+			+ numToRank(x) : "O-O" + (isCastleLong ? "-O" : ""))
 			+ (check ? ", check" : "")
 			+ (mate ? ", checkmate" : "");
 	}
