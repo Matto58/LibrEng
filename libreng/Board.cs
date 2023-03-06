@@ -101,7 +101,8 @@ public class Piece
 public class Board : IEnumerable<Piece>
 {
 	public Piece[,] pieces;
-	public Piece this[int x, int y] { get => pieces[x, y]; }
+	public Piece this[int x, int y] { get => pieces[x, y]; set => pieces[x, y] = value; }
+	public Piece this[int inx] { get => pieces[inx % 8, inx / 8]; set => pieces[inx % 8, inx / 8] = value; }
 
 	public Board()
 	{
