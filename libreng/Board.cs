@@ -130,7 +130,8 @@ public class Board : IEnumerable<Piece>
 	{
 		place(new(color, type, new(x, y)));
 	}
-	
+
+	#region piece search
 	/// <summary>
 	/// Selects pieces of a certain color from this board.
 	/// </summary>
@@ -240,6 +241,7 @@ public class Board : IEnumerable<Piece>
 		lookForPiecePositions(color, type)
 		.Select(t => pieces[t.x, t.y])
 		.ToList();
+	#endregion
 
 	/// <summary>
 	/// Draws the board and puts in a string.
@@ -297,6 +299,7 @@ public class Board : IEnumerable<Piece>
 		return board;
 	}
 
+	#region eval
 	/// <summary>
 	/// Gets an evalution of the current <see cref="Board"/> as a <see cref="float"/>.
 	/// </summary>
@@ -425,6 +428,7 @@ public class Board : IEnumerable<Piece>
 		+ Piece.materialInFullSet[PType.Knight] * Piece.evalFromType(PType.Knight)
 		+ Piece.materialInFullSet[PType.Queen] * Piece.evalFromType(PType.Queen)
 		+ Piece.materialInFullSet[PType.King] * Piece.evalFromType(PType.King);
+	#endregion
 
 	public IEnumerator<Piece> GetEnumerator()
 		=> (IEnumerator<Piece>)pieces.GetEnumerator();
