@@ -417,16 +417,13 @@ public class Board : IEnumerable<Piece>
 		return Piece.CORNER_DIST - (dist / count);
 	}
 
-	public static float maxMat
-	{
-		get =>
-			Piece.materialInFullSet[PType.Pawn] * Piece.evalFromType(PType.Pawn)
-			+ Piece.materialInFullSet[PType.Rook] * Piece.evalFromType(PType.Rook)
-			+ Piece.materialInFullSet[PType.Bishop] * Piece.evalFromType(PType.Bishop)
-			+ Piece.materialInFullSet[PType.Knight] * Piece.evalFromType(PType.Knight)
-			+ Piece.materialInFullSet[PType.Queen] * Piece.evalFromType(PType.Queen)
-			+ Piece.materialInFullSet[PType.King] * Piece.evalFromType(PType.King);
-	}
+	public static float maxMat =>
+		Piece.materialInFullSet[PType.Pawn] * Piece.evalFromType(PType.Pawn)
+		+ Piece.materialInFullSet[PType.Rook] * Piece.evalFromType(PType.Rook)
+		+ Piece.materialInFullSet[PType.Bishop] * Piece.evalFromType(PType.Bishop)
+		+ Piece.materialInFullSet[PType.Knight] * Piece.evalFromType(PType.Knight)
+		+ Piece.materialInFullSet[PType.Queen] * Piece.evalFromType(PType.Queen)
+		+ Piece.materialInFullSet[PType.King] * Piece.evalFromType(PType.King);
 
 	public IEnumerator<Piece> GetEnumerator()
 		=> (IEnumerator<Piece>)pieces.GetEnumerator();
