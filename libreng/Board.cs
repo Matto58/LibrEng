@@ -1,5 +1,6 @@
 ﻿namespace Mattodev.LibrEng;
 
+using System.Collections;
 using System.Numerics;
 using static System.MathF;
 
@@ -20,6 +21,16 @@ public enum PType
 }
 public class Piece
 {
+	public static readonly Dictionary<PType, int> materialInFullSet = new()
+	{
+		{ PType.Pawn, 8 },
+		{ PType.Rook, 2 },
+		{ PType.Bishop, 2 },
+		{ PType.Knight, 2 },
+		{ PType.King, 1 },
+		{ PType.Queen, 1 },
+	};
+
 	public PColor color;
 	public PType type;
 	public Vector2 pos;
@@ -70,15 +81,27 @@ public class Piece
 
 			_ => null
 		};
+	public static float evalFromType(PType t)
+		=> t switch
+		{
+			PType.Pawn => 1,
+			PType.Rook => 5,
+			PType.Bishop => 3,
+			PType.Knight => 3,
+			PType.Queen => 9,
+			PType.King => 1000,
+			_ => 0
+		};
 
-	public static float dist(int x1, int y1, int x2, int y2)
+	public static float dist(float x1, float y1, float x2, float y2)
 		=> Abs(Sqrt(x1 * x2 + y1 * y2));
 
 	public const float CORNER_DIST = 9.8994949366117f;
 }
-public class Board
+public class Board : IEnumerable<Piece>
 {
 	public Piece[,] pieces;
+	public Piece this[int x, int y] { get => pieces[x, y]; }
 
 	public Board()
 	{
@@ -273,17 +296,33 @@ public class Board
 		return board;
 	}
 
+	/// <summary>
+	/// Gets an evalution of the current <see cref="Board"/> as a <see cref="float"/>.
+	/// </summary>
+	/// <returns>The evaluation.</returns>
 	public float eval()
 	{
 		float e = 0f;
 		e += -kingSafety(PColor.Black) + kingSafety(PColor.White);
 		e += -material(PColor.Black) + material(PColor.White);
+		e += -distToCenter(PColor.Black) + distToCenter(PColor.White);
 		return e;
 	}
 
+	/// <summary>
+	/// Calculates king safety based on distance of enemy pieces and friendly pieces to friendly king.
+	/// </summary>
+	/// <param name="color">The color of the friendly king.</param>
+	/// <returns>An evaluation value.</returns>
 	public float kingSafety(PColor color)
-		=> kingSafetyPt1(color) + kingSafetyPt2(color);
+		=> kingSafetyPt1(color) - kingSafetyPt2(color);
 
+	/// <summary>
+	/// First part of the king safety evaluation.
+	/// Calculates king safety based on distance of friendly pieces to friendly king.
+	/// </summary>
+	/// <param name="color">The color of the friendly king.</param>
+	/// <returns>An evaluation value.</returns>
 	// determine king safety on average distance between
 	// friendly pieces and friendly king
 	public float kingSafetyPt1(PColor color)
@@ -310,8 +349,12 @@ public class Board
 		return Piece.CORNER_DIST - (dist / count);
 	}
 
-	// todo: finish kingSafetyPt2(PColor) and material(PColor)
-
+	/// <summary>
+	/// Second part of the king safety evaluation.
+	/// Calculates king unsafety based on distance of enemy pieces to friendly king.
+	/// </summary>
+	/// <param name="color">The color of the friendly king.</param>
+	/// <returns>An evaluation value.</returns>
 	// determine king unsafety on average distance between
 	// enemy pieces and friendly king
 	public float kingSafetyPt2(PColor color)
@@ -337,10 +380,57 @@ public class Board
 
 		return Piece.CORNER_DIST - (dist / count);
 	}
+
+	/// <summary>
+	/// Calculates an evaluation value based on material amount.
+	/// </summary>
+	/// <param name="color">The color of friendly pieces.</param>
+	/// <returns>An evaluation value.</returns>
 	public float material(PColor color)
 	{
-		float e = 0f;
+		float mat = 0f;
 
-		return e;
+		foreach (Piece p in this)
+			if (p.type != PType.Empty && p.color == color)
+				mat += Piece.evalFromType(p.type);
+
+		return mat - maxMat;
 	}
+
+	/// <summary>
+	/// Calculates an evaluation value based on average piece and pawn distance to center.
+	/// </summary>
+	/// <param name="color">The color of friendly pieces.</param>
+	/// <returns>An evaluation value.</returns>
+	public float distToCenter(PColor color)
+	{
+		float dist = 0f;
+		int count = 0;
+
+		foreach (Piece p in this)
+				if (p.type != PType.Empty && p.color == color)
+				{
+					dist += Piece.dist(p.pos.X, p.pos.Y, 3.5f, 3.5f);
+					count++;
+				}
+
+		return Piece.CORNER_DIST - (dist / count);
+	}
+
+	public static float maxMat
+	{
+		get =>
+			Piece.materialInFullSet[PType.Pawn] * Piece.evalFromType(PType.Pawn)
+			+ Piece.materialInFullSet[PType.Rook] * Piece.evalFromType(PType.Rook)
+			+ Piece.materialInFullSet[PType.Bishop] * Piece.evalFromType(PType.Bishop)
+			+ Piece.materialInFullSet[PType.Knight] * Piece.evalFromType(PType.Knight)
+			+ Piece.materialInFullSet[PType.Queen] * Piece.evalFromType(PType.Queen)
+			+ Piece.materialInFullSet[PType.King] * Piece.evalFromType(PType.King);
+	}
+
+	public IEnumerator<Piece> GetEnumerator()
+		=> (IEnumerator<Piece>)pieces.GetEnumerator();
+
+	IEnumerator IEnumerable.GetEnumerator()
+		=> GetEnumerator();
 }

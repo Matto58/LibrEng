@@ -1,5 +1,7 @@
 ﻿namespace Mattodev.LibrEng;
 
+using static System.MathF;
+
 public class Game
 {
 	public Board board;
@@ -35,7 +37,7 @@ public class Game
 		if (float.IsNaN(eval)) return "! 1101 Evaluation is NaN! (e.g. invalid board)"; // error 1101
 		
 		return
-			$"{move} to move - Eval: {(float.IsPositive(eval) ? "+" : "-")}{eval}\n" +
+			$"{move} to move - Eval: {(float.IsPositive(eval) ? "+" : "-")}{Round(eval, 2)}\n" +
 			$"White: {wtitle}{white.name} ({white.elo})\n" +
 			$"Black: {btitle}{black.name} ({black.elo})";
 	}

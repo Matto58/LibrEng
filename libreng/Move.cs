@@ -4,6 +4,11 @@ namespace Mattodev.LibrEng
 {
 	public class Move
 	{
+		/// <summary>
+		/// Converts an Y value from 0-7 to a-h.
+		/// </summary>
+		/// <param name="num">The Y value.</param>
+		/// <returns>A file ranging from a-h.</returns>
 		public static string numToFile(int num)
 			=> num switch
 			{
@@ -17,6 +22,12 @@ namespace Mattodev.LibrEng
 				7 => "h",
 				_ => ""
 			};
+
+		/// <summary>
+		/// Converts a X value from 0-7 to 8-1.
+		/// </summary>
+		/// <param name="num">The X value.</param>
+		/// <returns>A rank ranging from 8-1.</returns>
 		public static string numToRank(int num)
 			=> num switch
 			{
